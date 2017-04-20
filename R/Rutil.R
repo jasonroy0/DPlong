@@ -86,34 +86,13 @@ updatemean<-function(tempx,curtau,c0,mu0){
 
 ##############MASS PARAMETER UPDATES#######################################
 # mass parameter for y clusters
-newalpthet <- function(numclus, prioralp, alpa0, alpb0, nobs){
+newalpha   <- function(numclus, prioralp, alpa0, alpb0, nobs){
   eta      <- rbeta(1, prioralp + 1, nobs)
   pieta    <- ( numclus / ( nobs * ( 1 - log(eta) ) ) ) / ( 1 + numclus / ( nobs * ( 1 - log(eta) ) ) )
   whichmix <- rbinom(1, 1, pieta)
   newalp   <- whichmix * rgamma(1, (alpa0 + numclus), (alpb0 - log(eta) ) ) +
               ( 1 - whichmix ) * rgamma(1, (alpa0 + numclus - 1), (alpb0 - log(eta)))
   return(newalp)
-}
-
-# mass parameter for x clusters
-#update alpha_psi using MH
-newalppsi <- function(alpha, cluster, alpa0, alpb0, prop.a, prop.b) {
-  sortuniquey <- sort(unique(cluster[ , 1])) ## vector of unique y clusters
-  l <- length(sortuniquey)
-  k <- nrow(unique(cluster)) ## total number of clusters
-  #ss<-numeric(length(sortuniquey))
-  #for(j in 1:length(sortuniquey)){
-  #  ss[j]<-sum(cluster[,1]==sortuniquey[j])
-  #}
-  ss       <- as.numeric(table(cluster[,1])) ## number of subjects in each y cluster
-  likecur  <- dgamma(alpha, alpa0, alpb0) * ( alpha^(k - l) ) * 
-              prod( (alpha + ss) * beta( alpha + 1, ss))
-  proposed <- rgamma(1, prop.a, prop.b)
-  likeprop <- dgamma(proposed, alpa0, alpb0) * (proposed ^ (k - l)) * 
-              prod((proposed + ss) * beta(proposed + 1, ss))
-  rat      <- likeprop / likecur
-  if (runif(1, 0, 1) < rat) alpha <- proposed
-  return(alpha)
 }
 ############################################################################
 
