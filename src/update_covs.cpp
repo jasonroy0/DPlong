@@ -8,7 +8,7 @@ using namespace arma;
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List update_covs(mat matX, mat s, vec uniqueS,
+List update_covs(mat matX, ivec s, ivec uniqueS,
                  Nullable<mat> xpipars2, Nullable<mat> xmupars2, Nullable<mat> xsigpars2,
                  int p1, int p2, int ptrt,
                  double a0, double b0,
