@@ -197,7 +197,7 @@ List cluster(vec y, mat Xonly, mat Xall, vec ntp, vec ids, Nullable<mat> Z2, vec
         }
       }
         
-      probs(k) = ( nlwoi / (nobs - 1 + alpha) ) * likeregy * prodx * prodx2 * likeregb;
+      probs(k) = ( njwoi / (nobs - 1 + alpha) ) * likeregy * prodx * prodx2 * likeregb;
 
       
     } // ends probs for existing clusters
