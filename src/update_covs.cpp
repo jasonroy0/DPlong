@@ -8,7 +8,7 @@ using namespace arma;
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List update_covs(mat matX, mat s, mat uniqueS,
+List update_covs(mat matX, mat s, vec uniqueS,
                  Nullable<mat> xpipars2, Nullable<mat> xmupars2, Nullable<mat> xsigpars2,
                  int p1, int p2, int ptrt,
                  double a0, double b0,
@@ -39,17 +39,10 @@ List update_covs(mat matX, mat s, mat uniqueS,
   int  dummy, nx, sizex;
   double newdf, varx, numer, meanx, sumx, curtau, newvar, newmean;
   
-  int count = 0;
-  
-  int k = max(uniqueS.col(0)) - 1; //number of unique Y clusters
+  int k = max(uniqueS) - 1; //number of unique Y clusters
   
   for(int j = 0; j < k; j++) {
-    vdummy = find(uniqueS.col(0) == (j + 1));
-    nx = vdummy.n_elem;
-    //n.x <- length( unique( s[ s[ , 1 ] == j , 2] ) )  // number of x clusters within jth y cluster
-    
-    for(int l = 0; l < nx; l++) {
-      vdummy = find(s.col(0) == j + 1 && s.col(1) == l + 1);
+      vdummy = find(s == j + 1);
       tempX   = matX( vdummy, xpos ); 
        
       
@@ -59,7 +52,7 @@ List update_covs(mat matX, mat s, mat uniqueS,
           tempx   = tempX.col(ii);
           sumx    = sum(tempX.col(ii)); 
           sizex   = tempx.n_elem;
-          xpipars( count, ii ) = R::rbeta( sumx + a0 , sizex - sumx + b0 );
+          xpipars(j , ii ) = R::rbeta( sumx + a0 , sizex - sumx + b0 );
         }	
       }
       
@@ -73,17 +66,15 @@ List update_covs(mat matX, mat s, mat uniqueS,
           varx  = 0;
           if (sizex > 1) varx = var(tempx);
           numer = nu0 * tau0 + sizex * varx + (c0 * sizex / (c0 + sizex) ) * pow(meanx - mu0, 2);
-          xsigpars(count, ii) = rinvchisq( newdf, numer / newdf );
+          xsigpars(j, ii) = rinvchisq( newdf, numer / newdf );
           
           // posterior for mu. prior for mu|sigma^2 mean 0 prior sample size 2
-          curtau = xsigpars(count, ii);
+          curtau = xsigpars(j, ii);
           newvar = 1 / ( c0 / curtau + sizex / curtau);
           newmean = ( mu0 * c0 / curtau + meanx * sizex / curtau ) * newvar;
-          xmupars(count, ii) = R::rnorm( newmean, sqrt(newvar) );
+          xmupars(j, ii) = R::rnorm( newmean, sqrt(newvar) );
         }
       }
-      count++;
-    }
   } // end covariate parameter update
   
   if ( bin_exists && !cont_exists) {
