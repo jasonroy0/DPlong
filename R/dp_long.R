@@ -258,7 +258,7 @@ edp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, splin
 											Z,
 											rep(u.int, mpp),
 											beta.reg, sig.reg, b.reg,
-											s[ , 1 ], s[ , 2 ],
+											s ,
 											beta0, prec0, beta.a0, beta.b0,
 											sig2.b, a0.b, b0.b)
 
@@ -298,7 +298,7 @@ edp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, splin
 	## random intercept
 	get.u <- samp_u(y, as.matrix(mat.all), Z,
        						beta.reg, b.reg,
-       						id, s[ , 1],
+       						id, s,
        						sig2.u, sig.reg,
        						n)
 	u.int <- get.u$u
@@ -378,7 +378,6 @@ edp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, splin
 													 x.pi.pars, x.mu.pars, x.sig.pars, #X params
 													 ptrt, p1, p2,
 													 alpha
-													 s,
 													 s,
 													 unique0, #cluster
 													 beta0, prec0, beta.a0, beta.b0, #priors on Y params
@@ -485,8 +484,7 @@ edp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, splin
                   	ptrt        = ptrt,
                   	p1          = p1,
                   	p2          = p2,
-                  	alphapsi    = alpha.psi,
-                  	alphatheta  = alpha.theta,
+                  	alpha       = alpha,
                   	Sy          = s,
                   	uniqueS     = sortedunique,
                   	beta0       = beta0,
