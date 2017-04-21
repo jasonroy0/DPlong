@@ -26,7 +26,7 @@
 #'  @import dplyr
 #'  @import MCMCpack
 #'  @import mvnfast
-edp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline, verbose = FALSE, printevery = 100) {
+dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline, verbose = FALSE, printevery = 100) {
 
   N         <- length(id)
   unique.id <- unique(id)
