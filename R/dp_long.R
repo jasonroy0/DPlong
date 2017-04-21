@@ -377,7 +377,7 @@ edp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, splin
 													 beta.reg, sig.reg, b.reg,  #Y params
 													 x.pi.pars, x.mu.pars, x.sig.pars, #X params
 													 ptrt, p1, p2,
-													 alpha
+													 alpha,
 													 s,
 													 unique0, #cluster
 													 beta0, prec0, beta.a0, beta.b0, #priors on Y params
