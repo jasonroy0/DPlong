@@ -388,7 +388,7 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
 													 m # no. of aux params
   												 )
   	
-  	s          <- cluster_res$s 
+  	s          <- cluster_res$Sy 
   	beta.reg   <- cluster_res$betaY
   	sig.reg    <- as.vector(cluster_res$sig2)
   	x.pi.pars  <- cluster_res$xpipars
