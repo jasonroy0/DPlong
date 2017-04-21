@@ -62,10 +62,6 @@ List cluster(vec y, mat Xonly, mat Xall, vec ntp, vec ids, Nullable<mat> Z2, vec
   double likeregy, prodx, prodx2, likeregb;
 		
   // containers for auxiliary parameter values
-  mat xpipars_aux;
-  mat xmupars_aux;
-  mat xsigpars_aux;
-		
   mat betaY_aux;
   vec sig2_aux;
   mat b_aux;
@@ -248,7 +244,7 @@ List cluster(vec y, mat Xonly, mat Xall, vec ntp, vec ids, Nullable<mat> Z2, vec
       if (p2 > 0) {
         for(int ww = 0; ww < p2; ww++) {
           Y_xsigpars(w,ww) = rinvchisq(nu0,tau0);
-          Y_xmupars(w,ww) = R::rnorm(mu0,xsigpars_aux(w,ww)/sqrt(c0));
+          Y_xmupars(w,ww) = R::rnorm(mu0,Y_xsigpars(w,ww)/sqrt(c0));
         }
       }
     }
