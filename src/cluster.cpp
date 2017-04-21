@@ -120,6 +120,9 @@ List cluster(vec y, mat Xonly, mat Xall, vec ntp, vec ids, Nullable<mat> Z2, vec
         xsigpars.shed_row(vdummy1(0)); 
       }
       
+      vdummy2 = find(Sy == Sy(j)); //check if only person in Y cluster too
+      dummy2 = vdummy2.size();
+      
       //relabel Y cluster (if needed)
       if(dummy2==1) {
         for(int k = 0; k < Sy.size(); k++) {
