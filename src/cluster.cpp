@@ -227,12 +227,12 @@ List cluster(vec y, mat Xonly, mat Xall, vec ntp, vec ids, Nullable<mat> Z2, vec
 
     for(int w = 0; w < m; w++) {
       
-      sig2_aux(w) = 1/R::rgamma(beta_a0,beta_b0);
+      sig2_aux(w) = 1/R::rgamma(beta_a0, 1 / beta_b0);
       //betaY_aux.row(w) = trans(mvrnorm(beta0,sig2_aux(w)*prec0));
       betaY_aux.row(w) = trans(mvrnorm(beta0,sig2_aux(w)*prec0.i()));
       
       if (spl) {
-        sig2_b_aux(w) = 1/R::rgamma(a0_b,b0_b);
+        sig2_b_aux(w) = 1/R::rgamma(a0_b,1 / b0_b);
         
         for(int ww = 0; ww < nknots; ww++) {
           b_aux(w,ww) = R::rnorm(0,sqrt(sig2_b_aux(w)));
