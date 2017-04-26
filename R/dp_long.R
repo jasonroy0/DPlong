@@ -175,8 +175,14 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
 	long.rows <- rep( 1:nrow(x), times = mpp )
 	mat.all   <- x[ long.rows , ]
 	mat.all   <- cbind( 1, mat.all )  ## add intercept
-  mat.all   <- cbind( mat.all, timepoints )  ## add main effect for time
-	## make matrix for spline
+  
+  if ( nospline) {
+    mat.all   <- cbind( mat.all, timepoints )  ## add main effect for time
+  }
+
+  if( length(beta0) != ncol(mat.all)                ) stop( "beta0 not of right length" )
+	
+  ## make matrix for spline
 	if (!nospline) {
 		Z  <- splines::bs(timepoints, knots = knots, degree = degree)
   	nZ <- ncol(Z)

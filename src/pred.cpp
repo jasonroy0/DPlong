@@ -112,8 +112,11 @@ List pred(mat Xonly, Nullable<mat> Xonly2b, Nullable<mat> h0xb,
     currX = trans(Xonly.row(i));
     currX.insert_rows(0, 1);
     currX(0) = 1.0;
-    currX.insert_rows(currX.size(), 1);
-    currX(currX.size() - 1) = timepoint(i);
+    
+    if (!spline_exists) {
+      currX.insert_rows(currX.size(), 1);
+      currX(currX.size() - 1) = timepoint(i);
+    }
 
 		if (spline_exists) {
     	pred1(i) = R::rnorm( dot( betaY.row( Sy(i) - 1), currX) +
