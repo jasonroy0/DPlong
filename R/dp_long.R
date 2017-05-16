@@ -73,12 +73,24 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
   prop.b  <- prior$prop.b
 
 	# splines -- only perform these if splines have been specified
+  bspline <- FALSE
 	if (!nospline) {
-		nknots <- as.integer(spline$nknots)
-  	knots  <- spline$knots
+    if(!is.null(spline$bspline)) { 
+      bspline <- as.logical(spline$bspline) ## logical whether to use B-spline or thin plate spline
+  	} else {
+      bspline <- FALSE
+    }
+    knots  <- spline$knots
   	degree <- as.integer(spline$degree)
 	}
 	
+	## check validity of spline list values
+	if (!nospline) {
+    if(  is.null(knots)                   )                stop( " knots have NULL value" )
+  	if( !is.numeric(knots)                               ) stop( "knots must be a numeric vector" )
+  	if( ( !is.numeric(degree) | degree <= 0 ) ) stop( "degree must be integer > 0" )
+	}
+
 	# mcmc
 	burnin    		<- as.integer(mcmc$burnin)
 	ngibbs    		<- as.integer(mcmc$ngibbs)
@@ -140,12 +152,6 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
   if( prop.a <= 0 | prop.b <= 0                   ) stop( "prop.a and prop.b must be positive numbers" ) 
   if( !is.numeric(prop.a) | !is.numeric(prop.b)   ) stop( "prop.a and prop.b must be numeric" ) 
 
-	## check validity of spline list values
-	if (!nospline) {
-  	if( !is.numeric(nknots) | nknots < 0                   ) stop( "nknots must be an integer >=0" )
-  	if( !is.numeric(knots) | length(knots) != nknots       ) stop( "knots must be a numeric vector of length nknots" )
-  	if( nknots > 0 & ( !is.numeric(degree) | degree <= 0 ) ) stop( "degree must be integer > 0" )
-	}
 
 	if( !is.null(trt) ) {
 		x    <- cbind(trt, x)
@@ -184,8 +190,16 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
 	
   ## make matrix for spline
 	if (!nospline) {
-		Z  <- splines::bs(timepoints, knots = knots, degree = degree)
-  	nZ <- ncol(Z)
+    if (bspline) {
+		  Z  <- splines::bs(timepoints, knots = knots, degree = degree)
+  	} else {
+      Omega <- (abs(outer(knots, knots, "-")))^3
+      svd.Omega_all <- svd(Omega)
+      sqrt.Omega_all <- t(svd.Omega_all$v %*% (t(svd.Omega_all$u) * sqrt(svd.Omega_all$d)))
+      Z_k <- (abs(outer(timepoints, knots, "-")))^3
+      Z   <- t(solve(sqrt.Omega_all, t(Z_k)))
+    }
+    nZ <- ncol(Z)
 	} else {
 		Z <- NULL
 		nZ <- 0
@@ -206,11 +220,27 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
 		pt.new <- NULL
 	}
 
-	if (!nospline & !nopred) pZ <- predict(Z, pt)
-	else pZ <- NULL
+	if (!nospline & !nopred) {
+    if (bspline) {
+      pZ <- predict(Z, pt)
+    } else {
+      Z_k2 <- (abs(outer(pt, knots, "-")))^3
+      pZ <- t(solve(sqrt.Omega_all, t(Z_k2))) 
+    }
+  } else {
+    pZ <- NULL
+  }
 
-	if (!nospline & !is.null(n2)) pZ.new <- predict(Z, pt.new)
-	else pZ.new <- NULL
+	if (!nospline & !is.null(n2)) {
+    if (bspline) {
+      pZ.new <- predict(Z, pt.new)
+    } else {
+      Z_k3 <- (abs(outer(pt.new, knots, "-")))^3
+      pZ.new <- t(solve(sqrt.Omega_all, t(Z_k3))) 
+    }
+  }  else {
+    pZ.new <- NULL
+  }
 
 	
 	#### initialize cluster
@@ -502,7 +532,8 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
                   	timepoint   = pt,
 										timepoint2b = pt.new,
                   	tZb         = pZ,
-										tZ2b        = pZ.new )
+										tZ2b        = pZ.new,
+                    bspline     = bspline)
 
 	    pred.w.data[(i - burnin) / pred.rate, ]          <- preds$pred1
   	  if (!is.null(n2)) {
