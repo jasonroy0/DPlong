@@ -182,7 +182,7 @@ dp.long <- function(y, trt, newtrt, x, newx, id, timepoints, prior, mcmc, spline
 	mat.all   <- x[ long.rows , ]
 	mat.all   <- cbind( 1, mat.all )  ## add intercept
   
-  if ( nospline) {
+  if ( nospline | !bspline) {
     mat.all   <- cbind( mat.all, timepoints )  ## add main effect for time
   }
 
